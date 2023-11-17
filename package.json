@@ -1,0 +1,18 @@
+{
+  "name": "perceptron",
+  "version": "1.0.0",
+  "description": "App para vizualizar um perceptron aprendendo.",
+  "main": "script.js",
+  "scripts": {
+    "start": "parcel index.html",
+    "build-dev": "rm -rf dist && parcel build index.html --no-optimize --public-url ./",
+    "build": "rm -rf dist && parcel build index.html --public-url ./",
+    "pages": "push-dir --dir=dist --branch=gh-pages --cleanup --verbose",
+    "deploy": "npm run build && npm run pages"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel": "^2.10.3"
+  }
+}
