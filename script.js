@@ -9,6 +9,7 @@ const AXIS_OFFSET = 15;
 const TWO_PI = 2 * Math.PI;
 
 let hoveredPoint = null;
+let selectedPoint = null;
 
 const reds = blues.map((b) => ({ x: b.x * 4, y: b.y * 1.5 }));
 
@@ -74,6 +75,27 @@ function hoverPoint(event) {
     }
 }
 
+function panSelectedPoint(event) {
+    if (!selectedPoint) {
+        return;
+    }
+
+    let x = event.offsetX - AXIS_OFFSET;
+    let y = canvas.height - event.offsetY - AXIS_OFFSET;
+    selectedPoint.x = x;
+    selectedPoint.y = y;
+    requestAnimationFrame(draw);
+}
+
+function handleMouseMove(event) {
+    if (selectedPoint) {
+        panSelectedPoint(event);
+        return;
+    }
+
+    hoverPoint(event);
+}
+
 function createPointFromClick(event) {
     if (Boolean(hoveredPoint)) {
         return;
@@ -95,6 +117,21 @@ function createPointFromClick(event) {
     requestAnimationFrame(draw);
 }
 
+function handleMouseDown(event) {
+    if (Boolean(hoveredPoint)) {
+        selectedPoint = hoveredPoint;
+        return;
+    }
+
+    createPointFromClick(event);
+}
+
+function handleMouseUp() {
+    hoveredPoint = null;
+    selectedPoint = null;
+    requestAnimationFrame(draw);
+}
+
 function resize() {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
@@ -104,9 +141,10 @@ function resize() {
 }
 
 window.addEventListener('resize', debounce(resize, 200))
-window.addEventListener('mousedown', createPointFromClick);
+window.addEventListener('mousedown', handleMouseDown);
+window.addEventListener('mouseup', handleMouseUp);
 
 canvas.addEventListener('contextmenu', (event) => event.preventDefault());
-canvas.addEventListener('mousemove', throttle(hoverPoint, 100));
+canvas.addEventListener('mousemove', throttle(handleMouseMove, 20));
 
 resize();
