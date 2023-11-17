@@ -60,7 +60,7 @@ function paintPoins(points, color = 'blue') {
 
     for (let point of points) {
         ctx.beginPath();
-        ctx.arc(point.x, point.y, RADIUS, 0, TWO_PI);
+        ctx.arc(point.x * canvas.width, point.y * canvas.height, RADIUS, 0, TWO_PI);
         ctx.fill();
     }
 }
@@ -70,7 +70,7 @@ function highlightPoint(point) {
     ctx.lineWidth = 2;
 
     ctx.beginPath();
-    ctx.arc(point.x, point.y, RADIUS, 0, TWO_PI);
+    ctx.arc(point.x * canvas.width, point.y * canvas.height, RADIUS, 0, TWO_PI);
     ctx.stroke();
 
 }
@@ -83,8 +83,8 @@ function hoverPoint(event) {
         return;
     }
 
-    const point = { x, y }
-    const tolerance = RADIUS << 1;
+    const point = { x: x / canvas.width, y: y / canvas.height };
+    const tolerance = 0.02;
     let hover = findPoint(blues, point, tolerance) || findPoint(reds, point, tolerance);
 
     if (hoveredPoint !== hover) {
@@ -101,8 +101,8 @@ function panSelectedPoint(event) {
 
     let x = event.offsetX - AXIS_OFFSET;
     let y = canvas.height - event.offsetY - AXIS_OFFSET;
-    selectedPoint.x = x;
-    selectedPoint.y = y;
+    selectedPoint.x = x / canvas.width;
+    selectedPoint.y = y / canvas.height;
     requestAnimationFrame(draw);
 }
 
@@ -120,16 +120,19 @@ function createPointFromClick(event) {
         return;
     }
 
-    let x = event.offsetX - AXIS_OFFSET;
-    let y = canvas.height - event.offsetY - AXIS_OFFSET;
-
     if (event.button === 1 || event.button > 2) {
         return;
     }
 
+    let x = event.offsetX - AXIS_OFFSET;
+    let y = canvas.height - event.offsetY - AXIS_OFFSET;
+
     if (x < 0 || y < 0) {
         return;
     }
+
+    x /= canvas.width;
+    y /= canvas.height;
 
     const target = event.button === 0 ? blues : reds;
     target.push({ x, y })
@@ -162,6 +165,12 @@ function resize() {
 window.addEventListener('resize', debounce(resize, 200))
 window.addEventListener('mousedown', handleMouseDown);
 window.addEventListener('mouseup', handleMouseUp);
+
+window.addEventListener('keydown', () => {
+    const mapper = (p) => ({ x: p.x * canvas.width, y: p.y * canvas.height })
+    console.log(blues.map(mapper))
+    console.log(reds.map(mapper));
+})
 
 canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 canvas.addEventListener('mousemove', throttle(handleMouseMove, 20));
