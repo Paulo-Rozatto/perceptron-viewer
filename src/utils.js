@@ -5,8 +5,8 @@ const isSamePoint = (p1, p2, tolerance) => {
     return x <= tolerance && y <= tolerance;
 }
 
-export function hasPoint(src, point, tolerance = 0) {
-    return src.some((srcPoint) => isSamePoint(srcPoint, point, tolerance));
+export function findPoint(src, point, tolerance = 0) {
+    return src.find((srcPoint) => isSamePoint(srcPoint, point, tolerance));
 }
 
 export function debounce(callback, time) {
@@ -18,5 +18,18 @@ export function debounce(callback, time) {
         }
 
         timeout = setTimeout(callback, time)
+    }
+}
+
+export function throttle(callback, time) {
+    let isPaused = false;
+
+    const togglePause = () => { isPaused = !isPaused };
+
+    return (event) => {
+        if (isPaused) return;
+        togglePause();
+        callback(event);
+        setTimeout(togglePause, time)
     }
 }

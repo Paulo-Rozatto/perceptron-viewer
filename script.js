@@ -1,11 +1,14 @@
 import { Blues as blues } from "./data/dots";
-import { hasPoint, debounce } from "./src/utils";
+import { findPoint, debounce, throttle } from "./src/utils";
 
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
 const RADIUS = 7;
 const AXIS_OFFSET = 15;
+const TWO_PI = 2 * Math.PI;
+
+let hoveredPoint = null;
 
 const reds = blues.map((b) => ({ x: b.x * 4, y: b.y * 1.5 }));
 
@@ -14,6 +17,10 @@ function draw() {
 
     paintPoins(blues, 'blue');
     paintPoins(reds, 'red');
+
+    if (hoveredPoint) {
+        highlightPoint(hoveredPoint);
+    }
 
     // paint axis
     ctx.beginPath();
@@ -31,19 +38,24 @@ function draw() {
 function paintPoins(points, color = 'blue') {
     ctx.fillStyle = color;
 
-    const pi2 = Math.PI << 1;
     for (let point of points) {
         ctx.beginPath();
-        ctx.arc(point.x, point.y, RADIUS, 0, pi2);
+        ctx.arc(point.x, point.y, RADIUS, 0, TWO_PI);
         ctx.fill();
     }
 }
 
-function createPointFromClick(event) {
-    if (event.button === 1 || event.button > 2) {
-        return;
-    }
+function highlightPoint(point) {
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 2;
 
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, RADIUS, 0, TWO_PI);
+    ctx.stroke();
+
+}
+
+function hoverPoint(event) {
     let x = event.offsetX - AXIS_OFFSET;
     let y = canvas.height - event.offsetY - AXIS_OFFSET;
 
@@ -51,9 +63,30 @@ function createPointFromClick(event) {
         return;
     }
 
-    let point = { x, y };
-    
-    if (hasPoint(blues, point, RADIUS << 1) || hasPoint(reds, point, RADIUS << 1)) {
+    const point = { x, y }
+    const tolerance = RADIUS << 1;
+    let hover = findPoint(blues, point, tolerance) || findPoint(reds, point, tolerance);
+
+    if (hoveredPoint !== hover) {
+        hoveredPoint = hover;
+        requestAnimationFrame(draw);
+        canvas.style.cursor = hoveredPoint ? 'pointer' : '';
+    }
+}
+
+function createPointFromClick(event) {
+    if (Boolean(hoveredPoint)) {
+        return;
+    }
+
+    let x = event.offsetX - AXIS_OFFSET;
+    let y = canvas.height - event.offsetY - AXIS_OFFSET;
+
+    if (event.button === 1 || event.button > 2) {
+        return;
+    }
+
+    if (x < 0 || y < 0) {
         return;
     }
 
@@ -74,5 +107,6 @@ window.addEventListener('resize', debounce(resize, 200))
 window.addEventListener('mousedown', createPointFromClick);
 
 canvas.addEventListener('contextmenu', (event) => event.preventDefault());
+canvas.addEventListener('mousemove', throttle(hoverPoint, 100));
 
 resize();
