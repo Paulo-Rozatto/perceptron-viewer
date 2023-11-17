@@ -11,6 +11,8 @@ const TWO_PI = 2 * Math.PI;
 let hoveredPoint = null;
 let selectedPoint = null;
 
+const weights = [0, -1];
+const bias = 300;
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -22,9 +24,12 @@ function draw() {
         highlightPoint(hoveredPoint);
     }
 
+    paintClassifier(weights, bias);
+
     // paint axis
     ctx.beginPath();
     ctx.lineWidth = 5
+    ctx.strokeStyle = 'black';
 
     ctx.moveTo(0, -AXIS_OFFSET);
     ctx.lineTo(0, canvas.height);
@@ -32,6 +37,21 @@ function draw() {
     ctx.moveTo(-AXIS_OFFSET, 0);
     ctx.lineTo(canvas.width, 0);
 
+    ctx.stroke();
+}
+
+function paintClassifier(weights, bias) {
+    let [w1, w2] = weights;
+
+    ctx.beginPath()
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = 'green';
+
+    let start = bias / -w2;
+    let end = (canvas.width * w1 + bias) / -w2;
+
+    ctx.moveTo(0, start)
+    ctx.lineTo(canvas.width, end)
     ctx.stroke();
 }
 
