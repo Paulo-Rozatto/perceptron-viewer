@@ -1,4 +1,4 @@
-import { Blues as blues } from "./data/dots";
+import { Blues as blues, Reds as reds } from "./data/dots";
 import { findPoint, debounce, throttle } from "./src/utils";
 
 const canvas = document.querySelector("#canvas");
@@ -11,7 +11,6 @@ const TWO_PI = 2 * Math.PI;
 let hoveredPoint = null;
 let selectedPoint = null;
 
-const reds = blues.map((b) => ({ x: b.x * 4, y: b.y * 1.5 }));
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
