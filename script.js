@@ -1,5 +1,6 @@
 import { Blues as blues, Reds as reds } from "./data/dots";
 import { findPoint, debounce, throttle } from "./src/utils";
+import { train } from "./src/perceptron";
 
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
@@ -11,8 +12,22 @@ const TWO_PI = 2 * Math.PI;
 let hoveredPoint = null;
 let selectedPoint = null;
 
-const weights = [0, -1];
-const bias = 300;
+let weights = [Math.random() - 0.5, Math.random() - 0.5];
+let bias = Math.random() - 0.5;
+
+function perceptron() {
+    const shuffle = (array) => array.sort(() => Math.random() - 0.5);
+    let points = shuffle([
+        ...blues.map((p) => [p.x, p.y, 1]),
+        ...reds.map((p) => [p.x, p.y, 0])
+    ]);
+    const inputs = points.map(e => [e[0], e[1]]);
+    const labels = points.map(e => e[2])
+
+    bias = train(inputs, labels, weights, bias, 0.1, 1)
+
+    requestAnimationFrame(draw)
+}
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -41,17 +56,16 @@ function draw() {
 }
 
 function paintClassifier(weights, bias) {
-    let [w1, w2] = weights;
+    const [w1, w2] = weights;
+    const start = bias / -w2 * canvas.height;
+    const end = bias / -w1 * canvas.width;
 
     ctx.beginPath()
     ctx.lineWidth = 4;
     ctx.strokeStyle = 'green';
 
-    let start = bias / -w2;
-    let end = (canvas.width * w1 + bias) / -w2;
-
     ctx.moveTo(0, start)
-    ctx.lineTo(canvas.width, end)
+    ctx.lineTo(end, 0)
     ctx.stroke();
 }
 
@@ -163,16 +177,15 @@ function resize() {
 }
 
 window.addEventListener('resize', debounce(resize, 200))
-window.addEventListener('mousedown', handleMouseDown);
-window.addEventListener('mouseup', handleMouseUp);
-
-window.addEventListener('keydown', () => {
-    const mapper = (p) => ({ x: p.x * canvas.width, y: p.y * canvas.height })
-    console.log(blues.map(mapper))
-    console.log(reds.map(mapper));
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        perceptron();
+    }
 })
 
 canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 canvas.addEventListener('mousemove', throttle(handleMouseMove, 20));
+canvas.addEventListener('mousedown', handleMouseDown);
+canvas.addEventListener('mouseup', handleMouseUp);
 
 resize();
