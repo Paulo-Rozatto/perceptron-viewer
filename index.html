@@ -1,21 +1,46 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perceptron</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kameron&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <head>
-        <h3>Perceptron</h3>
-    </head>
+    <header>
+        <span id="title">
+            Perceptron
+        </span>
+        <span id="parameters">
+            <span>
+                <label for="">Épocas</label>
+                <input type="number" min="1" id="epochs">
+            </span>
+            <span>
+                <label for="w1">Peso 1</label>
+                <input type="number" step="0.1" min="-1" max="1" id="w1">
+            </span>
+            <span>
+                <label for="">Peso 2</label>
+                <input type="number" step="0.1" min="-1" max="1" id="w2">
+            </span>
+            <span>
+                <label for="">Bias</label>
+                <input type="number" step="0.1" min="-1" max="1" id="bias">
+            </span>
+            <button id="run">Rodar</button>
+        </span>
+        <button id="toggle">Toggle</button>
+    </header>
     <main>
         <canvas id="canvas"></canvas>
     </main>
-    <footer>
-        test
-    </footer>
     <script type="module" src="script.js"></script>
 </body>
+
 </html>

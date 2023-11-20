@@ -1,6 +1,7 @@
 import { Blues as blues, Reds as reds } from "./data/dots";
 import { findPoint, debounce, throttle } from "./src/utils";
 import { train } from "./src/perceptron";
+import { setParams, setRunFunction } from './src/ui-controller';
 
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
@@ -14,8 +15,10 @@ let selectedPoint = null;
 
 let weights = [Math.random() - 0.5, Math.random() - 0.5];
 let bias = Math.random() - 0.5;
+let epochs = 1;
 
-function perceptron() {
+
+function perceptron(W, b, eps) {
     const shuffle = (array) => array.sort(() => Math.random() - 0.5);
     let points = shuffle([
         ...blues.map((p) => [p.x, p.y, 1]),
@@ -24,7 +27,10 @@ function perceptron() {
     const inputs = points.map(e => [e[0], e[1]]);
     const labels = points.map(e => e[2])
 
-    bias = train(inputs, labels, weights, bias, 0.1, 1)
+    b = train(inputs, labels, W, b, 0.1, eps);
+    setParams(W, b, eps);
+    weights = W;
+    bias = b;
 
     requestAnimationFrame(draw)
 }
@@ -189,3 +195,5 @@ canvas.addEventListener('mousedown', handleMouseDown);
 canvas.addEventListener('mouseup', handleMouseUp);
 
 resize();
+setParams(weights, bias, epochs);
+setRunFunction(perceptron);
