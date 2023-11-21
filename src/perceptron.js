@@ -12,7 +12,8 @@ function activation(x) {
 }
 
 
-function trainStep(inputs, labels, weights, bias, learnRate) {
+export function trainStep(inputs, labels, weights, bias, learnRate) {
+    let updatedWeights = false;
     for (let i = 0; i < inputs.length; i++) {
         const prediction = activation(
             innerProduct(inputs[i], weights) + bias
@@ -28,14 +29,8 @@ function trainStep(inputs, labels, weights, bias, learnRate) {
         for (let j = 0; j < inputs[i].length; j++) {
             weights[j] += alpha * inputs[i][j];
         }
+        updatedWeights = true;
     }
 
-    return bias;
-}
-
-export function train(inputs, labels, weights, bias, learnRate, epochs) {
-    for (let i = 0; i < epochs; i++) {
-        bias = trainStep(inputs, labels, weights, bias, learnRate);
-    }
-    return bias;
+    return {bias, updatedWeights};
 }

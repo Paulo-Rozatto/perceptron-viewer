@@ -1,6 +1,6 @@
-import { Blues as blues, Reds as reds } from "./data/dots";
-import { findPoint, getClassifierPoint, debounce, throttle } from "./src/utils";
-import { train } from "./src/perceptron";
+import { DATA } from "./data/dots";
+import { findPoint, shuffle, debounce, throttle, findPoint, sleep } from "./src/utils";
+import { trainStep } from "./src/perceptron";
 import { setParams, setRunFunction } from './src/ui-controller';
 
 const canvas = document.querySelector("#canvas");
@@ -15,31 +15,38 @@ let selectedPoint = null;
 
 let weights = [Math.random(), Math.random() - 1];
 let bias = 0;
-let epochs = 1;
+let epochs = 50;
 
-
-function perceptron(W, b, eps) {
-    const shuffle = (array) => array.sort(() => Math.random() - 0.5);
-    let points = shuffle([
-        ...blues.map((p) => [p.x, p.y, 1]),
-        ...reds.map((p) => [p.x, p.y, 0])
-    ]);
+async function perceptron(W, b, eps) {
+    const points = shuffle(DATA);
     const inputs = points.map(e => [e[0], e[1]]);
     const labels = points.map(e => e[2])
 
-    b = train(inputs, labels, W, b, 0.1, eps);
-    setParams(W, b, eps);
-    weights = W;
+    weights[0] = W[0];
+    weights[1] = W[1];
     bias = b;
+    epochs = eps;
 
-    requestAnimationFrame(draw)
+    let result;
+    for (let i = 0; i < epochs; i++) {
+        result = trainStep(inputs, labels, weights, bias, 0.1)
+        bias = result.bias;
+
+        requestAnimationFrame(draw)
+        setParams(weights, bias, epochs);
+
+        if (!result.updatedWeights) {
+            break;
+        }
+
+        await sleep(200);
+    }
 }
 
 function draw() {
     ctx.clearRect(-15, -15, canvas.width, canvas.height);
 
-    paintPoins(blues, 'blue');
-    paintPoins(reds, 'red');
+    paintPoints(DATA);
 
     if (hoveredPoint) {
         highlightPoint(hoveredPoint);
@@ -77,12 +84,11 @@ function paintClassifier(weights, bias) {
     ctx.stroke();
 }
 
-function paintPoins(points, color = 'blue') {
-    ctx.fillStyle = color;
-
+function paintPoints(points) {
     for (let point of points) {
+        ctx.fillStyle = point[2] === 1 ? 'blue' : 'red';
         ctx.beginPath();
-        ctx.arc(point.x * canvas.width, point.y * canvas.height, RADIUS, 0, TWO_PI);
+        ctx.arc(point[0] * canvas.width, point[1] * canvas.height, RADIUS, 0, TWO_PI);
         ctx.fill();
     }
 }
@@ -92,7 +98,7 @@ function highlightPoint(point) {
     ctx.lineWidth = 2;
 
     ctx.beginPath();
-    ctx.arc(point.x * canvas.width, point.y * canvas.height, RADIUS, 0, TWO_PI);
+    ctx.arc(point[0] * canvas.width, point[1] * canvas.height, RADIUS, 0, TWO_PI);
     ctx.stroke();
 
 }
@@ -104,9 +110,9 @@ function hoverPoint(event) {
         return;
     }
 
-    const point = { x: x / canvas.width, y: y / canvas.height };
+    const point = [x / canvas.width, y / canvas.height];
     const tolerance = 0.02;
-    let hover = findPoint(blues, point, tolerance) || findPoint(reds, point, tolerance);
+    let hover = findPoint(DATA, point, tolerance);
 
     if (hoveredPoint !== hover) {
         hoveredPoint = hover;
@@ -122,8 +128,8 @@ function panSelectedPoint(event) {
 
     let x = event.offsetX - AXIS_OFFSET;
     let y = canvas.height - event.offsetY - AXIS_OFFSET;
-    selectedPoint.x = x / canvas.width;
-    selectedPoint.y = y / canvas.height;
+    selectedPoint[0] = x / canvas.width;
+    selectedPoint[1] = y / canvas.height;
     requestAnimationFrame(draw);
 }
 
@@ -155,8 +161,8 @@ function createPointFromClick(event) {
     x /= canvas.clientWidth;
     y /= canvas.clientHeight;
 
-    const target = event.button === 0 ? blues : reds;
-    target.push({ x, y })
+    const label = event.button === 0 ? 1 : 0;
+    DATA.push([x, y, label]);
     requestAnimationFrame(draw);
 }
 
