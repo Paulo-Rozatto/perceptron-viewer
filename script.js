@@ -1,7 +1,7 @@
 import { DATA } from "./data/dots";
 import { findPoint, shuffle, debounce, throttle, findPoint, sleep } from "./src/utils";
 import { trainStep } from "./src/perceptron";
-import { setParams, setRunFunction } from './src/ui-controller';
+import { setDrawFunction, setParams, setRunFunction } from './src/ui-controller';
 
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
@@ -198,6 +198,15 @@ function resize() {
     requestAnimationFrame(draw)
 }
 
+function onUiUpdate(W, b, eps) {
+    weights[0] = W[0];
+    weights[1] = W[1];
+    bias = b;
+    epochs = eps;
+
+    requestAnimationFrame(draw);
+}
+
 window.addEventListener('resize', debounce(resize, 200))
 
 canvas.addEventListener('contextmenu', (event) => event.preventDefault());
@@ -208,3 +217,4 @@ canvas.addEventListener('mouseup', handleMouseUp);
 resize();
 setParams(weights, bias, epochs);
 setRunFunction(perceptron);
+setDrawFunction(onUiUpdate);
