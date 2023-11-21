@@ -1,9 +1,8 @@
 import { Blues as blues, Reds as reds } from "./data/dots";
-import { findPoint, debounce, throttle } from "./src/utils";
+import { findPoint, getClassifierPoint, debounce, throttle } from "./src/utils";
 import { train } from "./src/perceptron";
 import { setParams, setRunFunction } from './src/ui-controller';
 
-const mainTag = document.querySelector("main");
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
@@ -14,8 +13,8 @@ const TWO_PI = 2 * Math.PI;
 let hoveredPoint = null;
 let selectedPoint = null;
 
-let weights = [Math.random() - 0.5, Math.random() - 0.5];
-let bias = Math.random() - 0.5;
+let weights = [Math.random(), Math.random() - 1];
+let bias = 0;
 let epochs = 1;
 
 
@@ -37,7 +36,7 @@ function perceptron(W, b, eps) {
 }
 
 function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(-15, -15, canvas.width, canvas.height);
 
     paintPoins(blues, 'blue');
     paintPoins(reds, 'red');
@@ -64,15 +63,17 @@ function draw() {
 
 function paintClassifier(weights, bias) {
     const [w1, w2] = weights;
-    const start = bias / -w2 * canvas.height;
-    const end = bias / -w1 * canvas.width;
+
+    const yIntercept = (bias / -w2) * canvas.height;
+    const endX = canvas.width;
+    const endY = ((w1 + bias) / -w2) * canvas.height;
 
     ctx.beginPath()
     ctx.lineWidth = 4;
     ctx.strokeStyle = 'green';
 
-    ctx.moveTo(0, start)
-    ctx.lineTo(end, 0)
+    ctx.moveTo(0, yIntercept)
+    ctx.lineTo(endX, endY)
     ctx.stroke();
 }
 
