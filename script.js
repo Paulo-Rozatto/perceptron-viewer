@@ -3,6 +3,7 @@ import { findPoint, debounce, throttle } from "./src/utils";
 import { train } from "./src/perceptron";
 import { setParams, setRunFunction } from './src/ui-controller';
 
+const mainTag = document.querySelector("main");
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
@@ -98,7 +99,6 @@ function highlightPoint(point) {
 function hoverPoint(event) {
     let x = event.offsetX - AXIS_OFFSET;
     let y = canvas.height - event.offsetY - AXIS_OFFSET;
-
     if (x < 0 || y < 0) {
         return;
     }
@@ -151,8 +151,8 @@ function createPointFromClick(event) {
         return;
     }
 
-    x /= canvas.width;
-    y /= canvas.height;
+    x /= canvas.clientWidth;
+    y /= canvas.clientHeight;
 
     const target = event.button === 0 ? blues : reds;
     target.push({ x, y })
@@ -175,19 +175,23 @@ function handleMouseUp() {
 }
 
 function resize() {
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+    // for some reason atrtibuting canvas.clientWidth directly to canvas.width don't work
+    // maybe some inner asyncronous stuff or delayed update
+    canvas.width = 1;
+    canvas.height = 1;
+
+    let x = canvas.clientWidth;
+    let y = canvas.clientHeight;
+
+    canvas.width = x;
+    canvas.height = y;
+
     ctx.transform(1, 0, 0, -1, 0, canvas.height)
     ctx.translate(AXIS_OFFSET, AXIS_OFFSET);
     requestAnimationFrame(draw)
 }
 
 window.addEventListener('resize', debounce(resize, 200))
-window.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        perceptron();
-    }
-})
 
 canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 canvas.addEventListener('mousemove', throttle(handleMouseMove, 20));

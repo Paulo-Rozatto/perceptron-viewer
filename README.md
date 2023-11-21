@@ -3,7 +3,6 @@
 App para vizualizar um perceptron aprendendo.
 
 ### Todo
-- Corrigir bug de criar/mover pontos;
 - Linha de classificação sempre visível;
 - Redesenhar a cada época;
 - Permitir alterar learning rate;
