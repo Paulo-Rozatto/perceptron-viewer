@@ -1,18 +1,24 @@
 import { DATA } from "./data/dots";
-import { findPoint, shuffle, debounce, throttle, findPoint, sleep } from "./src/utils";
+import { pointIndex, shuffle, debounce, throttle, sleep } from "./src/utils";
 import { trainStep } from "./src/perceptron";
 import { setDrawFunction, setParams, setRunFunction } from './src/ui-controller';
 
+// Setting canvas & context
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
+// Setting some aux constants
 const RADIUS = 7;
 const AXIS_OFFSET = 15;
 const TWO_PI = 2 * Math.PI;
 
+// Utils variables
+const hoveredCoords = [-1, -1];
 let hoveredPoint = null;
 let selectedPoint = null;
+let lastHoveredIndex = -1;
 
+// Main parameters
 let weights = [Math.random(), Math.random() - 1];
 let bias = 0;
 let epochs = 50;
@@ -68,6 +74,11 @@ function draw() {
     ctx.stroke();
 }
 
+function eventToCanvasCords(event) {
+    hoveredCoords[0] = (event.offsetX - AXIS_OFFSET) / canvas.clientWidth;
+    hoveredCoords[1] = 1 - (event.offsetY + AXIS_OFFSET) / canvas.clientHeight;
+}
+
 function paintClassifier(weights, bias) {
     const [w1, w2] = weights;
 
@@ -103,21 +114,20 @@ function highlightPoint(point) {
 
 }
 
-function hoverPoint(event) {
-    let x = event.offsetX - AXIS_OFFSET;
-    let y = canvas.height - event.offsetY - AXIS_OFFSET;
-    if (x < 0 || y < 0) {
+function hoverPoint() {
+    // x < 0 OR y < 0
+    if (hoveredCoords[0] < 0 || hoveredCoords[1] < 0) {
         return;
     }
 
-    const point = [x / canvas.width, y / canvas.height];
     const tolerance = 0.02;
-    let hover = findPoint(DATA, point, tolerance);
+    let index = pointIndex(DATA, hoveredCoords, tolerance);
 
-    if (hoveredPoint !== hover) {
-        hoveredPoint = hover;
+    if (index !== lastHoveredIndex) {
+        hoveredPoint = DATA[index];
         requestAnimationFrame(draw);
-        canvas.style.cursor = hoveredPoint ? 'pointer' : '';
+        canvas.style.cursor = hoveredCoords ? 'pointer' : '';
+        lastHoveredIndex = index;
     }
 }
 
@@ -126,14 +136,14 @@ function panSelectedPoint(event) {
         return;
     }
 
-    let x = event.offsetX - AXIS_OFFSET;
-    let y = canvas.height - event.offsetY - AXIS_OFFSET;
-    selectedPoint[0] = x / canvas.width;
-    selectedPoint[1] = y / canvas.height;
+    selectedPoint[0] = hoveredCoords[0]
+    selectedPoint[1] = hoveredCoords[1]
     requestAnimationFrame(draw);
 }
 
 function handleMouseMove(event) {
+    eventToCanvasCords(event);
+
     if (selectedPoint) {
         panSelectedPoint(event);
         return;
@@ -182,16 +192,10 @@ function handleMouseUp() {
 }
 
 function resize() {
-    // for some reason atrtibuting canvas.clientWidth directly to canvas.width don't work
-    // maybe some inner asyncronous stuff or delayed update
-    canvas.width = 1;
-    canvas.height = 1;
-
-    let x = canvas.clientWidth;
-    let y = canvas.clientHeight;
-
-    canvas.width = x;
-    canvas.height = y;
+    // that couple lines below don't guarantee that width and height will be equals to clientWidth and clientHeight
+    // it looks like that when chaging width/height the clientWidth/Height changes
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
 
     ctx.transform(1, 0, 0, -1, 0, canvas.height)
     ctx.translate(AXIS_OFFSET, AXIS_OFFSET);
@@ -214,7 +218,7 @@ canvas.addEventListener('mousemove', throttle(handleMouseMove, 20));
 canvas.addEventListener('mousedown', handleMouseDown);
 canvas.addEventListener('mouseup', handleMouseUp);
 
-resize();
 setParams(weights, bias, epochs);
 setRunFunction(perceptron);
 setDrawFunction(onUiUpdate);
+resize();

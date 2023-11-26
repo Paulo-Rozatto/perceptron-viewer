@@ -5,8 +5,8 @@ const isSamePoint = (p1, p2, tolerance) => {
     return x <= tolerance && y <= tolerance;
 }
 
-export function findPoint(src, point, tolerance = 0) {
-    return src.find((srcPoint) => isSamePoint(srcPoint, point, tolerance));
+export function pointIndex(src, point, tolerance = 0) {
+    return src.findIndex((srcPoint) => isSamePoint(srcPoint, point, tolerance));
 }
 
 export function shuffle(array) {
