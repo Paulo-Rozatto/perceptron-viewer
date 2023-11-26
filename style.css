@@ -59,13 +59,17 @@ button {
 }
 
 input {
-    width: calc(100% - 3rem);
+    width: 100%;
 }
 
-input::after {
+label {
+    padding-top: 15px;
+}
+
+label::after {
+    color: #555;
     content: attr(data-value);
-    position: relative;
-    left: 100%;
+    padding-left: 5px;
 }
 
 #toggle {

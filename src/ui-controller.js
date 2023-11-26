@@ -6,6 +6,11 @@ const w1 = document.querySelector("#w1");
 const w2 = document.querySelector("#w2");
 const bias = document.querySelector("#bias");
 
+epochs.label = document.querySelector('label[for="epochs"]');
+w1.label = document.querySelector('label[for="w1"]');
+w2.label = document.querySelector('label[for="w2"]');
+bias.label = document.querySelector('label[for="bias"]');
+
 let drawFunction = () => { };
 
 const debounceTime = 20;
@@ -24,7 +29,7 @@ function set_sanitize(field, value, min = -1, max = 1) {
     field.title = value;
 
     value = Number.isInteger(value) ? value : value.toFixed(2);
-    field.setAttribute('data-value', value);
+    field.label?.setAttribute('data-value', value);
 }
 
 function getParams() {
