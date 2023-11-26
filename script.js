@@ -42,6 +42,7 @@ async function perceptron(W, b, eps) {
         setParams(weights, bias, epochs);
 
         if (!result.updatedWeights) {
+            document.getElementById("message").classList.remove("hide");
             break;
         }
 
@@ -161,18 +162,12 @@ function createPointFromClick(event) {
         return;
     }
 
-    let x = event.offsetX - AXIS_OFFSET;
-    let y = canvas.height - event.offsetY - AXIS_OFFSET;
-
-    if (x < 0 || y < 0) {
+    if (hoveredCoords[0] < 0 || hoveredCoords[1] < 0) {
         return;
     }
 
-    x /= canvas.clientWidth;
-    y /= canvas.clientHeight;
-
     const label = event.button === 0 ? 1 : 0;
-    DATA.push([x, y, label]);
+    DATA.push([...hoveredCoords, label]);
     requestAnimationFrame(draw);
 }
 

@@ -1,6 +1,7 @@
 import { throttle } from "./utils";
 
 const btnRun = document.querySelector("#run");
+const message = document.querySelector("#message");
 const epochs = document.querySelector("#epochs")
 const w1 = document.querySelector("#w1");
 const w2 = document.querySelector("#w2");
@@ -53,6 +54,7 @@ export function setParams(weigths, b, eps) {
 
 export function setRunFunction(fnc) {
     btnRun.onclick = () => {
+        message.classList.add("hide");
         let p = getParams();
         fnc(p[0], p[1], p[2]);
     };

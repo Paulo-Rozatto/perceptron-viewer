@@ -90,6 +90,20 @@ canvas {
     border: 1px solid black;
 }
 
+.success-message {
+    /* margin-top: 5px; */
+    padding: 5px;
+    /* border-top: 1px solid darkgreen;
+    border-bottom: 1px solid darkgreen; */
+    background-color: hsl(120, 73%, 90%);
+    text-align: center;
+    color: darkgreen;
+}
+
+.hide {
+    display: none;
+}
+
 @media screen and (max-width: 900px) {
     main {
         flex-direction: column-reverse;

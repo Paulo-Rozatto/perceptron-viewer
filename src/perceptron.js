@@ -19,7 +19,7 @@ export function trainStep(inputs, labels, weights, bias, learnRate) {
             innerProduct(inputs[i], weights) + bias
         );
 
-        if (prediction[i] === labels[i]) {
+        if (prediction === labels[i]) {
             continue;
         }
 
