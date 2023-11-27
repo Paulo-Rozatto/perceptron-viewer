@@ -1,0 +1,160 @@
+:root {
+  --mango-tango: #fb8842;
+  --liver: #5c3218;
+  --cafe-au-lait: #a57c62;
+  --ogre-odor: #fa5241;
+  --brilliant-azure: #4194fa;
+  --raisin-black: #222;
+  --screamin-green: #59fa41;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Kameron, Times New Roman, Times, serif;
+  font-size: 14pt;
+}
+
+body {
+  background-color: var(--cafe-au-lait);
+  color: var(--mango-tango);
+  flex-direction: column;
+  height: 100vh;
+  display: flex;
+}
+
+button {
+  border: none;
+  border: 1px solid var(--mango-tango);
+  color: var(--mango-tango);
+  background: none;
+  border-radius: 10px;
+}
+
+header {
+  background-color: var(--raisin-black);
+  border-bottom: 1px solid var(--mango-tango);
+  z-index: 2;
+  flex-direction: row;
+  flex-grow: 1;
+  align-items: center;
+  padding: 5px;
+  display: flex;
+}
+
+#title {
+  text-shadow: 4px 4px 2px #000;
+  font-family: Kameron, Times New Roman, Times, serif;
+  font-size: 2.5rem;
+}
+
+main {
+  flex-grow: 5;
+  width: 100%;
+  max-height: 100%;
+  display: flex;
+  overflow-y: auto;
+}
+
+aside {
+  text-shadow: 0 1px 2px #000;
+  background-color: var(--raisin-black);
+  border-right: 1px solid var(--mango-tango);
+  flex-direction: column;
+  flex: 15%;
+  gap: 5px;
+  padding: 5px;
+  display: flex;
+  overflow-y: auto;
+}
+
+button {
+  cursor: pointer;
+  margin-top: 15px;
+  padding: 5px;
+}
+
+button:hover {
+  background-color: var(--cafe-au-lait);
+  color: var(--liver);
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--cafe-au-lait);
+  margin-top: 15px;
+}
+
+input {
+  width: 100%;
+}
+
+label {
+  padding-top: 15px;
+}
+
+label:after {
+  color: var(--cafe-au-lait);
+  content: attr(data-value);
+  padding-left: 5px;
+}
+
+#toggle {
+  text-align: center;
+  display: none;
+}
+
+#canvas-container {
+  flex: 85%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+canvas {
+  background-color: #fff;
+  border: 1px solid #000;
+  width: 95%;
+  height: 95%;
+  box-shadow: -2px 2px 10px #000;
+}
+
+.success-message {
+  background-color: var(--screamin-green);
+  color: #006400;
+  text-align: center;
+  text-shadow: none;
+  border: 1px solid #006400;
+  padding: 5px;
+  font-weight: bold;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.hide {
+  display: none;
+}
+
+@media screen and (width <= 900px) {
+  main {
+    flex-direction: column-reverse;
+  }
+
+  aside {
+    border: none;
+    flex: 30%;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  #canvas-container {
+    flex: 70%;
+    max-height: 100%;
+    overflow-y: auto;
+  }
+}
+
+/*# sourceMappingURL=index.3a01df49.css.map */
