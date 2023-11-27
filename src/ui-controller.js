@@ -16,16 +16,9 @@ let drawFunction = () => { };
 
 const debounceTime = 20;
 
-function set_sanitize(field, value, min = -1, max = 1) {
+function set(field, value, min = -1, max = 1) {
     value = parseFloat(value) || 0;
 
-    if (field === epochs) {
-        min = 1;
-        max = 100;
-    }
-
-    value = Math.max(value, min)
-    value = Math.min(value, max);
     field.value = value;
     field.title = value;
 
@@ -34,10 +27,6 @@ function set_sanitize(field, value, min = -1, max = 1) {
 }
 
 function getParams() {
-    set_sanitize(w1, w1.value);
-    set_sanitize(w2, w2.value);
-    set_sanitize(bias, bias.value);
-    set_sanitize(epochs, epochs.value);
     return [
         [parseFloat(w1.value), parseFloat(w2.value)],
         parseFloat(bias.value),
@@ -46,10 +35,10 @@ function getParams() {
 }
 
 export function setParams(weigths, b, eps) {
-    set_sanitize(w1, weigths[0]);
-    set_sanitize(w2, weigths[1]);
-    set_sanitize(bias, b);
-    set_sanitize(epochs, eps, 1, 50);
+    set(w1, weigths[0]);
+    set(w2, weigths[1]);
+    set(bias, b);
+    set(epochs, eps, 1, 50);
 }
 
 export function setRunFunction(fnc) {
@@ -70,7 +59,7 @@ let onUiUpdate = () => {
     drawFunction(p[0], p[1], p[2]);
 };
 function onInput(event) {
-    set_sanitize(event.target, event.target.value);
+    set(event.target, event.target.value);
     onUiUpdate();
 }
 

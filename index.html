@@ -21,6 +21,8 @@
     <main>
         <aside>
             <button id="run">Rodar</button>
+            <hr>
+
             <label for="epochs">Épocas:</label>
             <input type="range" min="1" max="100" id="epochs">
 
@@ -32,11 +34,14 @@
 
             <label for="bias">Bias:</label>
             <input type="range" step="0.01" min="-1" max="1" id="bias">
-            <p class="success-message hide" id="message">Convergiu!</p>
+
+            <hr>
         </aside>
         <div id="canvas-container">
             <canvas id="canvas"></canvas>
         </div>
+
+        <p class="success-message hide" id="message">Convergiu!</p>
     </main>
     <script type="module" src="script.js"></script>
 </body>

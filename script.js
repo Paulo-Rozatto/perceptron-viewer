@@ -7,6 +7,11 @@ import { setDrawFunction, setParams, setRunFunction } from './src/ui-controller'
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
+// colors
+const OGRE = "#FA5241";
+const AZURE = "#4194FA";
+const OPACITY = "99";
+
 // Setting some aux constants
 const RADIUS = 7;
 const AXIS_OFFSET = 15;
@@ -42,7 +47,11 @@ async function perceptron(W, b, eps) {
         setParams(weights, bias, epochs);
 
         if (!result.updatedWeights) {
-            document.getElementById("message").classList.remove("hide");
+            const message = document.getElementById("message");
+            message.classList.remove("hide");
+            setTimeout(() => {
+                message.classList.add("hide");
+            }, 1500);
             break;
         }
 
@@ -53,31 +62,62 @@ async function perceptron(W, b, eps) {
 function draw() {
     ctx.clearRect(-15, -15, canvas.width, canvas.height);
 
+    paintClassifier(weights, bias);
+
     paintPoints(DATA);
 
     if (hoveredPoint) {
         highlightPoint(hoveredPoint);
     }
 
-    paintClassifier(weights, bias);
-
     // paint axis
     ctx.beginPath();
-    ctx.lineWidth = 5
-    ctx.strokeStyle = 'black';
 
     ctx.moveTo(0, -AXIS_OFFSET);
-    ctx.lineTo(0, canvas.height);
+    ctx.lineTo(0, canvas.height - AXIS_OFFSET)
+    ctx.lineTo(10, canvas.height - AXIS_OFFSET - 20);
+    ctx.lineTo(0, canvas.height - AXIS_OFFSET)
+    ctx.lineTo(-10, canvas.height - AXIS_OFFSET - 20);
 
     ctx.moveTo(-AXIS_OFFSET, 0);
-    ctx.lineTo(canvas.width, 0);
+    ctx.lineTo(canvas.width - AXIS_OFFSET, 0);
+    ctx.lineTo(canvas.width - AXIS_OFFSET - 20, 10);
+    ctx.lineTo(canvas.width - AXIS_OFFSET, 0);
+    ctx.lineTo(canvas.width - AXIS_OFFSET - 20, -10);
 
+    ctx.lineWidth = 3
+    ctx.strokeStyle = 'black';
     ctx.stroke();
 }
 
 function eventToCanvasCords(event) {
     hoveredCoords[0] = (event.offsetX - AXIS_OFFSET) / canvas.clientWidth;
     hoveredCoords[1] = 1 - (event.offsetY + AXIS_OFFSET) / canvas.clientHeight;
+}
+
+function paintArea(yIntercept, endX, endY, sign) {
+    let color;
+
+    color = sign > 0 ? AZURE : OGRE;
+    ctx.fillStyle = color + OPACITY;
+    ctx.beginPath();
+    ctx.moveTo(0, yIntercept);
+    ctx.lineTo(0, canvas.height);
+    ctx.lineTo(endX, canvas.height);
+    ctx.lineTo(endX, endY);
+    ctx.closePath();
+    ctx.fill();
+
+    color = sign > 0 ? OGRE : AZURE;
+    let min = Math.min(0, endY, yIntercept);
+    ctx.fillStyle = color + OPACITY;
+    ctx.beginPath();
+    ctx.moveTo(0, yIntercept);
+    ctx.lineTo(0, min);
+    ctx.lineTo(endX, min);
+    ctx.lineTo(endX, endY);
+    ctx.closePath();
+    ctx.fill();
 }
 
 function paintClassifier(weights, bias) {
@@ -87,9 +127,11 @@ function paintClassifier(weights, bias) {
     const endX = canvas.width;
     const endY = ((w1 + bias) / -w2) * canvas.height;
 
+    paintArea(yIntercept, endX, endY, Math.sign(w2));
+
     ctx.beginPath()
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = 'green';
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "black";
 
     ctx.moveTo(0, yIntercept)
     ctx.lineTo(endX, endY)
